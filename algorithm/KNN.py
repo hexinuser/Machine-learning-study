@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-KNN近邻算法, 分类判别
-输入: inX: 测试集元素(以判定所属类)，1*N
-     dataSet: 训练集样本(样本数为M, M个1*N元素) M*N
-     labels:  训练集样本对应的分类 1*M
-     上述均为numoy数组，否则会返回错误
-     k: 近邻算法的临近个数，k<=M
-输出: inX最有可能的分类个数
+KNN Classification
+
 Created on Tue Apr 17 13:16:47 2018
 
 @author: hexin
@@ -17,19 +12,24 @@ import matplotlib.pyplot as plt
 from os import listdir
 
 def classify0(inX, dataSet, labels, k):
-    """ 对测试数据到训练集的按欧式距离排序，由k值得到最终的预测分类 """
+    """ input: inX: test data，1*N
+          dataSet: training data M*N
+          labels: the label of training set  1*M
+     data type of the above are numpy arrays 
+     k: the number of data in the nearest，k<=M (int)
+          the distance of KNN is Euclidean distance  """
     dataSetsize = dataSet.shape[0]
-    ###欧式距离
-    diffMat = np.tile(inX,(dataSetsize,1))-dataSet #np.tile是对数组进行广播,指定行列次数
-    sqdiffMat = diffMat**2  #得到的为M*N的数组
-    sqdistance = np.sqrt(np.sum(sqdiffMat,axis=1))#直接比较欧式距离的平方大小，减少计算量,返回一个一维数组
-    sortedSqdistInd = sqdistance.argsort()#对一维数组进行从小到大排序，返回索引
-    #利用字典搜寻排序
+
+    diffMat = np.tile(inX,(dataSetsize,1))-dataSet #use np.tile to broadcast
+    sqdiffMat = diffMat**2  
+    sqdistance = np.sqrt(np.sum(sqdiffMat,axis=1))#get the Euclidean distance among inX and all test data
+    sortedSqdistInd = sqdistance.argsort()#sort number index
+    #Dictionary sort
     classCount={}          
     for i in range(k):
         votelabel = labels[sortedSqdistInd[i]]
         classCount[votelabel] = classCount.get(votelabel,0) + 1 
-        #dict.get(key, default=None) key字典中要查找的键.default如果指定键的值不存在时,返回该默认值值。
+        
     sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
     return sortedClassCount[0][0]
 ##利用列表排序, 比较测试字典搜寻稍快
@@ -71,7 +71,7 @@ def creatDataset():
 def fileDeal(filename):
     #读取文本数据进行处理,返回为数组存贮训练样本集, 和对应分类列表 
     #对应三列分别为: 每年飞行里程数；玩视频游戏所占时间；消费的冰淇淋公升数
-    fread = open(filename)
+    fread = open(filename) #read file 
     listLines = fread.readlines() #读取文本存为列表，每一行为一个列表元素
     numberOfLines = len(listLines)
     returnArray = np.zeros((numberOfLines,3)) #数据为3列
@@ -88,7 +88,7 @@ def fileDeal(filename):
 dateArray, dateLabel = fileDeal('datingTestSet2.txt')
     
 def dataPlot(dateArray,dateLabel):
-    fig = plt.figure(figsize=(10,10))
+    fig = plt.figure(figsize=(10,10))#
     ax1 = fig.add_subplot(221)
     ax1.scatter(dateArray[:,1],dateArray[:,2])
 #    ax1.axis([-2,25,-0.2,2.0])
